@@ -9,6 +9,8 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 
 // Load environment variables from .env file
+const path = require('path');
+// Load environment variables from .env file
 dotenv.config();
 
 const app = express();
@@ -37,6 +39,9 @@ app.use((req, res, next) => {
   console.log(`📥 ${req.method} ${req.path} - ${new Date().toLocaleTimeString()}`);
   next();
 });
+
+// Serve static files from the Vite build directory (dist)
+app.use(express.static(path.join(__dirname, 'dist')));
 
 // =====================================================
 // ROUTES
@@ -94,6 +99,13 @@ app.post('/api/webhook/n8n', (req, res) => {
   }
 
   res.json({ received: true, timestamp: new Date().toISOString() });
+});
+
+// =====================================================
+// SPA HANDLER - Serve index.html for all non-API routes
+// =====================================================
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 // =====================================================
